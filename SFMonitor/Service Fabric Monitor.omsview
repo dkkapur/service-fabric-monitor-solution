@@ -45,7 +45,7 @@
                         "Name": "Service Fabric Monitor",
                         "Author": "dekapur@microsoft.com",
                         "Source": "Local",
-                        "Version": 1,
+                        "Version": 2,
                         "Dashboard": [
                             {
                                 "Id": "TwoTrendsAndListBuilderBlade",
@@ -61,7 +61,7 @@
                                     "Trend1": {
                                         "Legend": "Events",
                                         "LegendColor": "#00188f",
-                                        "ChartQuery": "Type=ServiceFabricOperationalEvent",
+                                        "ChartQuery": "ServiceFabricOperationalEvent | sort by TimeGenerated desc// Oql: Type=ServiceFabricOperationalEvent",
                                         "Calculation": {
                                             "Operation": "Sum"
                                         }
@@ -75,7 +75,7 @@
                                         }
                                     },
                                     "List": {
-                                        "Query": "Type=ServiceFabricOperationalEvent | measure count() by Computer",
+                                        "Query": "ServiceFabricOperationalEvent | summarize AggregatedValue = count() by Computer, TaskName // Oql: Type=ServiceFabricOperationalEvent | measure count() by Computer, TaskName",
                                         "HideGraph": false,
                                         "enableSparklines": false,
                                         "operation": "Summary",
@@ -108,7 +108,7 @@
                                             ]
                                         },
                                         "NameDSVSeparator": "",
-                                        "NavigationQuery": " (Type=ServiceFabricOperationalEvent) {selected item}"
+                                        "NavigationQuery": "search in (ServiceFabricOperationalEvent) {selected item}// Oql: (Type=ServiceFabricOperationalEvent) {selected item}"
                                     }
                                 }
                             },
@@ -126,7 +126,7 @@
                                     "Trend1": {
                                         "Legend": "Stdout",
                                         "LegendColor": "#00188f",
-                                        "ChartQuery": "Type=ContainerLog LogEntrySource=stdout",
+                                        "ChartQuery": "ContainerLog | where LogEntrySource == \"stdout\" | sort by TimeGenerated desc// Oql: Type=ContainerLog LogEntrySource=stdout",
                                         "Calculation": {
                                             "Operation": "Sum"
                                         }
@@ -134,13 +134,13 @@
                                     "Trend2": {
                                         "Legend": "Stderr",
                                         "LegendColor": "#eb3c00",
-                                        "ChartQuery": "Type=ContainerLog LogEntrySource=stderr ",
+                                        "ChartQuery": "ContainerLog | where LogEntrySource == \"stderr\" | sort by TimeGenerated desc// Oql: Type=ContainerLog LogEntrySource=stderr",
                                         "Calculation": {
                                             "Operation": "Sum"
                                         }
                                     },
                                     "List": {
-                                        "Query": "Type=ContainerLog  | measure count() by Computer, Name",
+                                        "Query": "ContainerLog | summarize AggregatedValue = count() by Computer, Name// Oql: Type=ContainerLog  | measure count() by Computer, Name",
                                         "HideGraph": false,
                                         "enableSparklines": false,
                                         "operation": "Summary",
@@ -173,7 +173,7 @@
                                             ]
                                         },
                                         "NameDSVSeparator": "",
-                                        "NavigationQuery": "Type=ContainerLog {selected item} | select TimeGenerated, Computer, Name, Image, ImageTag, LogEntrySource, LogEntry | Display Table"
+                                        "NavigationQuery": "search in (ContainerLog) {selected item} | project TimeGenerated, Computer, Name, Image, ImageTag, LogEntrySource, LogEntry | render table// Oql: Type=ContainerLog {selected item} | select TimeGenerated, Computer, Name, Image, ImageTag, LogEntrySource, LogEntry | Display Table"
                                     }
                                 }
                             },
@@ -191,7 +191,7 @@
                                     "Trend1": {
                                         "Legend": "events",
                                         "LegendColor": "#00188f",
-                                        "ChartQuery": "Type=ServiceFabricReliableServiceEvent",
+                                        "ChartQuery": "ServiceFabricReliableServiceEvent | sort by TimeGenerated desc\r\n// Oql: Type=ServiceFabricReliableServiceEvent",
                                         "Calculation": {
                                             "Operation": "Sum"
                                         }
@@ -205,7 +205,7 @@
                                         }
                                     },
                                     "List": {
-                                        "Query": "Type=ServiceFabricReliableServiceEvent | measure count() by Computer",
+                                        "Query": "ServiceFabricReliableServiceEvent | summarize AggregatedValue = count() by Computer\r\n// Oql: Type=ServiceFabricReliableServiceEvent | measure count() by Computer",
                                         "HideGraph": false,
                                         "enableSparklines": false,
                                         "operation": "Summary",
@@ -238,7 +238,7 @@
                                             ]
                                         },
                                         "NameDSVSeparator": "",
-                                        "NavigationQuery": "{selected item}"
+                                        "NavigationQuery": "search {selected item}\r\n// Oql: {selected item}"
                                     }
                                 }
                             },
@@ -255,20 +255,20 @@
                                     },
                                     "Tile": {
                                         "Legend": "Application Count",
-                                        "Query": "(Type=ServiceFabricOperationalEvent) | measure count() by ApplicationName"
+                                        "Query": "ServiceFabricReliableServiceEvent | where ApplicationName != \"\" | summarize AggregatedValue = dcount(ApplicationName) // Oql: (Type=ServiceFabricReliableServiceEvent) NOT(ServiceName=\"\") | measure countdistinct(ApplicationName) by ApplicationName"
                                     },
                                     "SecondTile": {
                                         "Legend": "Service Count",
-                                        "Query": "(Type=ServiceFabricOperationalEvent) | measure count() by ServiceName"
+                                        "Query": "ServiceFabricReliableServiceEvent | where ServiceName != \"\" | summarize AggregatedValue = dcount(ServiceName) // Oql: (Type=ServiceFabricReliableServiceEvent) NOT(ServiceName=\"\") | measure countdistinct(ServiceName) by ServiceName"
                                     },
                                     "List": {
-                                        "Query": " (Type=ServiceFabricOperationalEvent) | measure count() by ServiceName, Computer",
+                                        "Query": "ServiceFabricReliableServiceEvent | where ApplicationName != \"\" | summarize AggregatedValue = count() by ApplicationName, ServiceName, Computer // Oql: ServiceFabricReliableServiceEvent | measure count() by ApplicationName, ServiceName, Computer",
                                         "HideGraph": true,
                                         "enableSparklines": false,
                                         "operation": "Summary",
                                         "ColumnsTitle": {
-                                            "Name": "Node",
-                                            "Value": "Count"
+                                            "Name": "ApplicationName",
+                                            "Value": "Events"
                                         },
                                         "Color": "#0072c6",
                                         "thresholds": {
@@ -295,7 +295,7 @@
                                             ]
                                         },
                                         "NameDSVSeparator": "",
-                                        "NavigationQuery": "{selected item}"
+                                        "NavigationQuery": "search {selected item}// Oql: {selected item}"
                                     }
                                 }
                             },
@@ -312,14 +312,14 @@
                                     },
                                     "Tile": {
                                         "Legend": "Images",
-                                        "Query": "Type=ContainerImageInventory  | measure count() by ImageID"
+                                        "Query": "ContainerImageInventory | summarize AggregatedValue = count() by ImageID| count // Oql: Type=ContainerImageInventory  | measure count() by ImageID"
                                     },
                                     "SecondTile": {
                                         "Legend": "Image Type Count",
-                                        "Query": "Type=ContainerImageInventory  | measure count() by Image"
+                                        "Query": "ContainerImageInventory | summarize AggregatedValue = count() by Image| count // Oql: Type=ContainerImageInventory  | measure count() by Image"
                                     },
                                     "List": {
-                                        "Query": "Type=ContainerImageInventory  | measure count() by Image, ImageTag, Running",
+                                        "Query": "ContainerImageInventory | summarize AggregatedValue = count() by Image, ImageTag, Running// Oql: Type=ContainerImageInventory  | measure count() by Image, ImageTag, Running",
                                         "HideGraph": false,
                                         "enableSparklines": false,
                                         "operation": "Summary",
@@ -352,7 +352,7 @@
                                             ]
                                         },
                                         "NameDSVSeparator": "",
-                                        "NavigationQuery": "{selected item}"
+                                        "NavigationQuery": "search {selected item}// Oql: {selected item}"
                                     }
                                 }
                             },
@@ -372,7 +372,7 @@
                                                 "Subtitle": ""
                                             },
                                             "LineChart": {
-                                                "Query": "Type = Perf  ObjectName= \"Container\" CounterName=\"% Processor Time\" | Measure Avg(CounterValue) as AvgCPUPercent by InstanceName interval 30minutes",
+                                                "Query": "Perf | where ObjectName == \"Container\" and CounterName == \"% Processor Time\" | summarize AvgCPUPercent = avg(CounterValue) by InstanceName, bin(TimeGenerated, 30m) | render timechart // Oql: Type = Perf  ObjectName= \"Container\" CounterName=\"% Processor Time\" | Measure Avg(CounterValue) as AvgCPUPercent by InstanceName interval 30minutes",
                                                 "yAxis": {
                                                     "isLogarithmic": false,
                                                     "units": {
@@ -390,7 +390,7 @@
                                                 "Subtitle": ""
                                             },
                                             "LineChart": {
-                                                "Query": "Type=Perf ObjectName=Container CounterName=\"Memory Usage MB\" | Measure Avg(CounterValue) as AvgUsedMemory by InstanceName interval 30minute",
+                                                "Query": "Perf | where ObjectName == \"Container\" and CounterName == \"Memory Usage MB\" | summarize AvgUsedMemory = avg(CounterValue) by InstanceName, bin(TimeGenerated, 30m) | render timechart// Oql: Type=Perf ObjectName=Container CounterName=\"Memory Usage MB\" | Measure Avg(CounterValue) as AvgUsedMemory by InstanceName interval 30minute",
                                                 "yAxis": {
                                                     "isLogarithmic": false,
                                                     "units": {
@@ -408,7 +408,7 @@
                                                 "Subtitle": ""
                                             },
                                             "LineChart": {
-                                                "Query": "Type=Perf ObjectName=Container (CounterName=\"Disk Writes MB\") | Measure Avg(CounterValue) as AvgDiskWrite by InstanceName interval 30minute",
+                                                "Query": "Perf | where ObjectName == \"Container\" and CounterName == \"Disk Writes MB\" | summarize AvgDiskWrite = avg(CounterValue) by InstanceName, bin(TimeGenerated, 30m) | render timechart// Oql: Type=Perf ObjectName=Container (CounterName=\"Disk Writes MB\") | Measure Avg(CounterValue) as AvgDiskWrite by InstanceName interval 30minute",
                                                 "yAxis": {
                                                     "isLogarithmic": false,
                                                     "units": {
@@ -439,7 +439,7 @@
                                                 "Subtitle": ""
                                             },
                                             "LineChart": {
-                                                "Query": "Type=Perf CounterName=\"% Processor Time\" InstanceName=\"_Total\" | Measure Avg(CounterValue) as AvgCPUPercent by Computer interval 30minute",
+                                                "Query": "Perf | where CounterName == \"% Processor Time\" and InstanceName == \"_Total\" | summarize AvgCPUPercent = avg(CounterValue) by Computer, bin(TimeGenerated, 30m) | render timechart// Oql: Type=Perf CounterName=\"% Processor Time\" InstanceName=\"_Total\" | Measure Avg(CounterValue) as AvgCPUPercent by Computer interval 30minute",
                                                 "yAxis": {
                                                     "isLogarithmic": false,
                                                     "units": {
@@ -457,7 +457,7 @@
                                                 "Subtitle": ""
                                             },
                                             "LineChart": {
-                                                "Query": "Type=Perf ObjectName=Memory (CounterName=\"% Used Memory\" OR CounterName=\"% Committed Bytes In Use\") |Measure Avg(CounterValue) as AvgUsedMemory by Computer interval 30minute",
+                                                "Query": "Perf | where ObjectName == \"Memory\" and (CounterName == \"% Used Memory\" or CounterName == \"% Committed Bytes In Use\") | summarize AvgUsedMemory = avg(CounterValue) by Computer, bin(TimeGenerated, 30m) | render timechart // Oql: Type=Perf ObjectName=Memory (CounterName=\"% Used Memory\" OR CounterName=\"% Committed Bytes In Use\") |Measure Avg(CounterValue) as AvgUsedMemory by Computer interval 30minute",
                                                 "yAxis": {
                                                     "isLogarithmic": false,
                                                     "units": {
@@ -475,7 +475,7 @@
                                                 "Subtitle": ""
                                             },
                                             "LineChart": {
-                                                "Query": "Type=Perf (CounterName=\"Free Megabytes\") (InstanceName=\"/\" OR InstanceName=\"_Total\") | Measure Max(CounterValue) as FreeDiskSpace by Computer interval 30minute  ",
+                                                "Query": "Perf | where CounterName == \"Free Megabytes\" and (InstanceName == \"/\" or InstanceName == \"_Total\") | summarize FreeDiskSpace = max(CounterValue) by Computer, bin(TimeGenerated, 30m) | render timechart// Oql: Type=Perf (CounterName=\"Free Megabytes\") (InstanceName=\"/\" OR InstanceName=\"_Total\") | Measure Max(CounterValue) as FreeDiskSpace by Computer interval 30minute",
                                                 "yAxis": {
                                                     "isLogarithmic": false,
                                                     "units": {
@@ -503,31 +503,31 @@
                                     },
                                     "queries": [
                                         {
-                                            "query": "Type=ETWEvent Computer IN {(Type=ServiceFabricReliableServiceEvent OR Type=ServiceFabricReliableActorEvent OR Type=ServiceFabricOperationalEvent) | distinct Computer} ",
+                                            "query": "ETWEvent | where Computer in ((union ServiceFabricOperationalEvent, ServiceFabricReliableServiceEvent, ServiceFabricReliableActorEvent | distinct Computer)) | sort by TimeGenerated desc// Oql: Type=ETWEvent Computer IN {(Type=ServiceFabricReliableServiceEvent OR Type=ServiceFabricReliableActorEvent OR Type=ServiceFabricOperationalEvent) | distinct Computer}",
                                             "displayName": "Application events (ETW)"
                                         },
                                         {
-                                            "query": "Type=ContainerInventory   |select  Computer, Name, Image, ImageTag, ContainerState, CreatedTime, StartedTime, FinishedTime | Display Table",
+                                            "query": "ContainerInventory | sort by TimeGenerated desc | project Computer, Name, Image, ImageTag, ContainerState, CreatedTime, StartedTime, FinishedTime | render table// Oql: Type=ContainerInventory   |select  Computer, Name, Image, ImageTag, ContainerState, CreatedTime, StartedTime, FinishedTime | Display Table",
                                             "displayName": "List all container lifecycle information"
                                         },
                                         {
-                                            "query": "Type=ContainerImageInventory | select Computer, Image, ImageTag, ImageSize, Running | Display Table",
+                                            "query": "ContainerImageInventory | sort by TimeGenerated desc | project Computer, Image, ImageTag, ImageSize, Running | render table// Oql: Type=ContainerImageInventory | select Computer, Image, ImageTag, ImageSize, Running | Display Table",
                                             "displayName": "List of container images on each node"
                                         },
                                         {
-                                            "query": "Type=ContainerServiceLog TimeGenerated > NOW-24HOURS",
+                                            "query": "ContainerServiceLog | where TimeGenerated > ago(24h) | sort by TimeGenerated desc// Oql: Type=ContainerServiceLog TimeGenerated > NOW-24HOURS",
                                             "displayName": "Container service logs in the past 24 hours."
                                         },
                                         {
-                                            "query": "Type=ServiceFabricReliableActorEvent",
+                                            "query": "ServiceFabricReliableActorEvent | sort by TimeGenerated desc// Oql: Type=ServiceFabricReliableActorEvent",
                                             "displayName": "List of all Reliable Actors events"
                                         },
                                         {
-                                            "query": "Type=ServiceFabricReliableActorEvent TaskName=ReplicaChangeRoleToPrimary | measure count() by ReplicaId ",
+                                            "query": "ServiceFabricReliableActorEvent | where TaskName == \"ReplicaChangeRoleToPrimary\" | summarize AggregatedValue = count() by ReplicaId// Oql: Type=ServiceFabricReliableActorEvent TaskName=ReplicaChangeRoleToPrimary | measure count() by ReplicaId",
                                             "displayName": "Replica IDs of stateful actor replicas that became primary"
                                         },
                                         {
-                                            "query": "Type=ServiceFabricReliableActorEvent AND TaskName=ActorMethodThrewException | measure count() by ActorId",
+                                            "query": "ServiceFabricReliableActorEvent | where TaskName == \"ActorMethodThrewException\" | summarize AggregatedValue = count() by ActorId// Oql: Type=ServiceFabricReliableActorEvent AND TaskName=ActorMethodThrewException | measure count() by ActorId",
                                             "displayName": "List of actor exceptions thrown"
                                         }
                                     ]
@@ -538,20 +538,20 @@
                         "OverviewTile": {
                             "Id": "TwoTrendsBuilderTile",
                             "Type": "OverviewTile",
-                            "Version": 0,
+                            "Version": 2,
                             "Configuration": {
                                 "Trend1": {
-                                    "Legend": "Services",
+                                    "Legend": "Operational Channel Events",
                                     "LegendColor": "#00188f",
-                                    "ChartQuery": "(Type=ServiceFabricOperationalEvent) | measure count() by ServiceName",
+                                    "ChartQuery": "ServiceFabricOperationalEvent | sort by TimeGenerated desc// Oql: Type=ServiceFabricOperationalEvent",
                                     "Calculation": {
                                         "Operation": "Sum"
                                     }
                                 },
                                 "Trend2": {
-                                    "Legend": "Containers",
+                                    "Legend": "Container Events",
                                     "LegendColor": "#0072c6",
-                                    "ChartQuery": "Type=ContainerInventory ContainerState=Running",
+                                    "ChartQuery": "ContainerLog | sort by TimeGenerated desc// Oql: Type=ContainerLog",
                                     "Calculation": {
                                         "Operation": "Sum"
                                     }
@@ -559,7 +559,7 @@
                                 "Advanced": {
                                     "DataFlowVerification": {
                                         "Enabled": false,
-                                        "Query": "*",
+                                        "Query": "search * | sort by TimeGenerated desc",
                                         "Message": ""
                                     }
                                 }
