@@ -1,6 +1,6 @@
 # Service Fabric Monitor
 
-This is the preview version of the new Service Fabric Monitor solution that will be introduced in OMS / Log Analytics in October, 2017. Please feel free to try it out and leave feedback via *Issues* or by emailing me at dekapur@microsoft.com.
+This is the preview version of the new Service Fabric Monitor solution that will be introduced in OMS / Log Analytics in November, 2017. Please feel free to try it out and leave feedback via *Issues* or by emailing me at dekapur@microsoft.com.
 
 ## Setting up the solution 
 
