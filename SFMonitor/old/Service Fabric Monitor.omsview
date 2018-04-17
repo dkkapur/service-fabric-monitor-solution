@@ -78,6 +78,7 @@
                                         "Query": "ServiceFabricOperationalEvent | summarize AggregatedValue = count() by Computer, TaskName // Oql: Type=ServiceFabricOperationalEvent | measure count() by Computer, TaskName",
                                         "HideGraph": false,
                                         "enableSparklines": false,
+                                        "operation": "Summary",
                                         "ColumnsTitle": {
                                             "Name": "Node",
                                             "Value": "Count"
@@ -107,13 +108,7 @@
                                             ]
                                         },
                                         "NameDSVSeparator": "",
-                                        "NavigationQuery": "search {selected item} | sort by TimeGenerated desc",
-                                        "NavigationSelect": {
-                                            "NavigationQuery": "search {selected item} | sort by TimeGenerated desc"
-                                        }
-                                    },
-                                    "Blade": {
-                                        "NavigationSelect": {}
+                                        "NavigationQuery": "search in (ServiceFabricOperationalEvent) {selected item}// Oql: (Type=ServiceFabricOperationalEvent) {selected item}"
                                     }
                                 }
                             },
@@ -131,7 +126,7 @@
                                     "Trend1": {
                                         "Legend": "Stdout",
                                         "LegendColor": "#00188f",
-                                        "ChartQuery": "let ['EmptyTable'] = view () {datatable(LogEntrySource:string,TimeGenerated:datetime) [] }; let tempTable = ContainerLog | where LogEntrySource == \"stdout\" | project LogEntrySource, TimeGenerated; let containerLogTable = union kind = inner isfuzzy = true tempTable, (EmptyTable);  containerLogTable | sort by TimeGenerated desc",
+                                        "ChartQuery": "ContainerLog | where LogEntrySource == \"stdout\" | sort by TimeGenerated desc// Oql: Type=ContainerLog LogEntrySource=stdout",
                                         "Calculation": {
                                             "Operation": "Sum"
                                         }
@@ -139,15 +134,16 @@
                                     "Trend2": {
                                         "Legend": "Stderr",
                                         "LegendColor": "#eb3c00",
-                                        "ChartQuery": "let ['EmptyTable'] = view () {datatable(LogEntrySource:string,TimeGenerated:datetime) [] }; let tempTable = ContainerLog | where LogEntrySource == \"stderr\" | project LogEntrySource, TimeGenerated; let containerLogTable = union kind = inner isfuzzy = true tempTable, (EmptyTable);  containerLogTable | sort by TimeGenerated desc",
+                                        "ChartQuery": "ContainerLog | where LogEntrySource == \"stderr\" | sort by TimeGenerated desc// Oql: Type=ContainerLog LogEntrySource=stderr",
                                         "Calculation": {
                                             "Operation": "Sum"
                                         }
                                     },
                                     "List": {
-                                        "Query": "let ['EmptyTable'] = view () {datatable(Computer:string,Name:string) [] }; let tempTable = ContainerLog | project Computer, Name; let containerLogTable = union kind = inner isfuzzy = true tempTable, (EmptyTable);  containerLogTable | summarize AggregatedValue = count() by Computer, Name",
+                                        "Query": "ContainerLog | summarize AggregatedValue = count() by Computer, Name// Oql: Type=ContainerLog  | measure count() by Computer, Name",
                                         "HideGraph": false,
                                         "enableSparklines": false,
+                                        "operation": "Summary",
                                         "ColumnsTitle": {
                                             "Name": "Node",
                                             "Value": "Events"
@@ -177,13 +173,7 @@
                                             ]
                                         },
                                         "NameDSVSeparator": "",
-                                        "NavigationQuery": "search {selected item} | sort by TimeGenerated desc",
-                                        "NavigationSelect": {
-                                            "NavigationQuery": "search {selected item} | sort by TimeGenerated desc"
-                                        }
-                                    },
-                                    "Blade": {
-                                        "NavigationSelect": {}
+                                        "NavigationQuery": "search in (ContainerLog) {selected item} | project TimeGenerated, Computer, Name, Image, ImageTag, LogEntrySource, LogEntry | render table// Oql: Type=ContainerLog {selected item} | select TimeGenerated, Computer, Name, Image, ImageTag, LogEntrySource, LogEntry | Display Table"
                                     }
                                 }
                             },
@@ -201,7 +191,7 @@
                                     "Trend1": {
                                         "Legend": "events",
                                         "LegendColor": "#00188f",
-                                        "ChartQuery": "ServiceFabricReliableServiceEvent | sort by TimeGenerated desc// Oql: Type=ServiceFabricReliableServiceEvent",
+                                        "ChartQuery": "ServiceFabricReliableServiceEvent | sort by TimeGenerated desc\r\n// Oql: Type=ServiceFabricReliableServiceEvent",
                                         "Calculation": {
                                             "Operation": "Sum"
                                         }
@@ -215,7 +205,7 @@
                                         }
                                     },
                                     "List": {
-                                        "Query": "ServiceFabricReliableServiceEvent | summarize AggregatedValue = count() by Computer// Oql: Type=ServiceFabricReliableServiceEvent | measure count() by Computer",
+                                        "Query": "ServiceFabricReliableServiceEvent | summarize AggregatedValue = count() by Computer\r\n// Oql: Type=ServiceFabricReliableServiceEvent | measure count() by Computer",
                                         "HideGraph": false,
                                         "enableSparklines": false,
                                         "operation": "Summary",
@@ -248,13 +238,7 @@
                                             ]
                                         },
                                         "NameDSVSeparator": "",
-                                        "NavigationQuery": "search {selected item} | sort by TimeGenerated desc",
-                                        "NavigationSelect": {
-                                            "NavigationQuery": "search {selected item} | sort by TimeGenerated desc"
-                                        }
-                                    },
-                                    "Blade": {
-                                        "NavigationSelect": {}
+                                        "NavigationQuery": "search {selected item}\r\n// Oql: {selected item}"
                                     }
                                 }
                             },
@@ -311,13 +295,7 @@
                                             ]
                                         },
                                         "NameDSVSeparator": "",
-                                        "NavigationQuery": "search {selected item} | sort by TimeGenerated desc",
-                                        "NavigationSelect": {
-                                            "NavigationQuery": "search {selected item} | sort by TimeGenerated desc"
-                                        }
-                                    },
-                                    "Blade": {
-                                        "NavigationSelect": {}
+                                        "NavigationQuery": "search {selected item}// Oql: {selected item}"
                                     }
                                 }
                             },
@@ -327,21 +305,21 @@
                                 "Version": 0,
                                 "Configuration": {
                                     "General": {
-                                        "title": "Containers Status",
+                                        "title": "Container Image Inventory",
                                         "newGroup": false,
                                         "icon": "",
                                         "useIcon": false
                                     },
                                     "Tile": {
-                                        "Legend": "Container nodes",
-                                        "Query": "let ['EmptyTable'] = view () {datatable(ContainerState:string,TimeGenerated:datetime,Computer:string,ContainerID:string) [] }; let tempTable = ContainerInventory | where ContainerState == \"Running\" and TimeGenerated > ago(12h) | project ContainerState, TimeGenerated, ContainerID, Computer; let ContainerInventoryTable = union kind = inner isfuzzy = true tempTable, (EmptyTable); ContainerInventoryTable | summarize AggregatedValue = dcount(ContainerID) by Computer | count"
+                                        "Legend": "Images",
+                                        "Query": "ContainerImageInventory | summarize AggregatedValue = count() by ImageID| count // Oql: Type=ContainerImageInventory  | measure count() by ImageID"
                                     },
                                     "SecondTile": {
-                                        "Legend": "Running containers",
-                                        "Query": "let ['EmptyTable'] = view () {datatable(ContainerState:string,TimeGenerated:datetime,Computer:string,ContainerID:string) [] }; let tempTable = ContainerInventory | where ContainerState == \"Running\" and TimeGenerated > ago(12h) | project ContainerState, TimeGenerated, ContainerID, Computer; let ContainerInventoryTable = union kind = inner isfuzzy = true tempTable, (EmptyTable);  ContainerInventoryTable | summarize AggregatedValue = dcount(ContainerID) by ContainerID | count"
+                                        "Legend": "Image Type Count",
+                                        "Query": "ContainerImageInventory | summarize AggregatedValue = count() by Image| count // Oql: Type=ContainerImageInventory  | measure count() by Image"
                                     },
                                     "List": {
-                                        "Query": "let ['EmptyTable'] = view () {datatable(ContainerState:string,TimeGenerated:datetime,Computer:string,ContainerID:string,Image:string) [] }; let tempTable = ContainerInventory | where ContainerState == \"Running\" and TimeGenerated > ago(12h) | project ContainerState, TimeGenerated, ContainerID, Computer, Image; let ContainerInventoryTable = union kind = inner isfuzzy = true tempTable, (EmptyTable);  ContainerInventoryTable | summarize AggregatedValue = dcount(ContainerID) by Computer, Image",
+                                        "Query": "ContainerImageInventory | summarize AggregatedValue = count() by Image, ImageTag, Running// Oql: Type=ContainerImageInventory  | measure count() by Image, ImageTag, Running",
                                         "HideGraph": false,
                                         "enableSparklines": false,
                                         "operation": "Summary",
@@ -374,14 +352,75 @@
                                             ]
                                         },
                                         "NameDSVSeparator": "",
-                                        "NavigationQuery": "search {selected item} | sort by TimeGenerated desc",
-                                        "NavigationSelect": {
-                                            "NavigationQuery": "search {selected item} | sort by TimeGenerated desc"
-                                        }
-                                    },
-                                    "Blade": {
-                                        "NavigationSelect": {}
+                                        "NavigationQuery": "search {selected item}// Oql: {selected item}"
                                     }
+                                }
+                            },
+                            {
+                                "Id": "LineChartCalloutStackedBuilderBlade",
+                                "Type": "Blade",
+                                "Version": 0,
+                                "Configuration": {
+                                    "General": {
+                                        "title": "Container metrics",
+                                        "newGroup": false
+                                    },
+                                    "charts": [
+                                        {
+                                            "Header": {
+                                                "Title": "CPU (%)",
+                                                "Subtitle": ""
+                                            },
+                                            "LineChart": {
+                                                "Query": "Perf | where ObjectName == \"Container\" and CounterName == \"% Processor Time\" | summarize AvgCPUPercent = avg(CounterValue) by InstanceName, bin(TimeGenerated, 30m) | render timechart // Oql: Type = Perf  ObjectName= \"Container\" CounterName=\"% Processor Time\" | Measure Avg(CounterValue) as AvgCPUPercent by InstanceName interval 30minutes",
+                                                "yAxis": {
+                                                    "isLogarithmic": false,
+                                                    "units": {
+                                                        "baseUnitType": "",
+                                                        "baseUnit": "",
+                                                        "displayUnit": ""
+                                                    },
+                                                    "customLabel": ""
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "Header": {
+                                                "Title": "Memory (%)",
+                                                "Subtitle": ""
+                                            },
+                                            "LineChart": {
+                                                "Query": "Perf | where ObjectName == \"Container\" and CounterName == \"Memory Usage MB\" | summarize AvgUsedMemory = avg(CounterValue) by InstanceName, bin(TimeGenerated, 30m) | render timechart// Oql: Type=Perf ObjectName=Container CounterName=\"Memory Usage MB\" | Measure Avg(CounterValue) as AvgUsedMemory by InstanceName interval 30minute",
+                                                "yAxis": {
+                                                    "isLogarithmic": false,
+                                                    "units": {
+                                                        "baseUnitType": "",
+                                                        "baseUnit": "",
+                                                        "displayUnit": ""
+                                                    },
+                                                    "customLabel": ""
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "Header": {
+                                                "Title": "Disk Write (MB)",
+                                                "Subtitle": ""
+                                            },
+                                            "LineChart": {
+                                                "Query": "Perf | where ObjectName == \"Container\" and CounterName == \"Disk Writes MB\" | summarize AvgDiskWrite = avg(CounterValue) by InstanceName, bin(TimeGenerated, 30m) | render timechart// Oql: Type=Perf ObjectName=Container (CounterName=\"Disk Writes MB\") | Measure Avg(CounterValue) as AvgDiskWrite by InstanceName interval 30minute",
+                                                "yAxis": {
+                                                    "isLogarithmic": false,
+                                                    "units": {
+                                                        "baseUnitType": "",
+                                                        "baseUnit": "",
+                                                        "displayUnit": ""
+                                                    },
+                                                    "customLabel": ""
+                                                }
+                                            }
+                                        }
+                                    ]
                                 }
                             },
                             {
@@ -409,8 +448,7 @@
                                                         "displayUnit": ""
                                                     },
                                                     "customLabel": ""
-                                                },
-                                                "NavigationSelect": {}
+                                                }
                                             }
                                         },
                                         {
@@ -428,8 +466,7 @@
                                                         "displayUnit": ""
                                                     },
                                                     "customLabel": ""
-                                                },
-                                                "NavigationSelect": {}
+                                                }
                                             }
                                         },
                                         {
@@ -447,78 +484,7 @@
                                                         "displayUnit": ""
                                                     },
                                                     "customLabel": ""
-                                                },
-                                                "NavigationSelect": {}
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                "Id": "LineChartCalloutStackedBuilderBlade",
-                                "Type": "Blade",
-                                "Version": 0,
-                                "Configuration": {
-                                    "General": {
-                                        "title": "Container metrics",
-                                        "newGroup": false
-                                    },
-                                    "charts": [
-                                        {
-                                            "Header": {
-                                                "Title": "CPU (%)",
-                                                "Subtitle": ""
-                                            },
-                                            "LineChart": {
-                                                "Query": "let ['EmptyTable'] = view () {datatable(ObjectName:string,TimeGenerated:datetime,InstanceName:string,CounterName:string,CounterValue:double) [] }; let tempTable = Perf | where ObjectName == \"Container\" and CounterName == \"% Processor Time\" | project ObjectName, TimeGenerated, InstanceName, CounterName, CounterValue; let ContainerPerfTable = union kind = inner isfuzzy = true tempTable, (EmptyTable);  ContainerPerfTable | summarize AvgCPUPercent = avg(CounterValue) by InstanceName, bin(TimeGenerated, 30m) | render timechart",
-                                                "yAxis": {
-                                                    "isLogarithmic": false,
-                                                    "units": {
-                                                        "baseUnitType": "",
-                                                        "baseUnit": "",
-                                                        "displayUnit": ""
-                                                    },
-                                                    "customLabel": ""
-                                                },
-                                                "NavigationSelect": {}
-                                            }
-                                        },
-                                        {
-                                            "Header": {
-                                                "Title": "Memory (%)",
-                                                "Subtitle": ""
-                                            },
-                                            "LineChart": {
-                                                "Query": "let ['EmptyTable'] = view () {datatable(ObjectName:string,TimeGenerated:datetime,InstanceName:string,CounterName:string,CounterValue:double) [] }; let tempTable = Perf | where ObjectName == \"Container\" and CounterName == \"Memory Usage MB\" | project ObjectName, TimeGenerated, InstanceName, CounterName, CounterValue; let ContainerPerfTable = union kind = inner isfuzzy = true tempTable, (EmptyTable);  ContainerPerfTable | summarize AvgCPUPercent = avg(CounterValue) by InstanceName, bin(TimeGenerated, 30m) | render timechart",
-                                                "yAxis": {
-                                                    "isLogarithmic": false,
-                                                    "units": {
-                                                        "baseUnitType": "",
-                                                        "baseUnit": "",
-                                                        "displayUnit": ""
-                                                    },
-                                                    "customLabel": ""
-                                                },
-                                                "NavigationSelect": {}
-                                            }
-                                        },
-                                        {
-                                            "Header": {
-                                                "Title": "Disk Write (MB)",
-                                                "Subtitle": ""
-                                            },
-                                            "LineChart": {
-                                                "Query": "let ['EmptyTable'] = view () {datatable(ObjectName:string,TimeGenerated:datetime,InstanceName:string,CounterName:string,CounterValue:double) [] }; let tempTable = Perf | where ObjectName == \"Container\" and CounterName == \"Disk Writes MB\" | project ObjectName, TimeGenerated, InstanceName, CounterName, CounterValue; let ContainerPerfTable = union kind = inner isfuzzy = true tempTable, (EmptyTable);  ContainerPerfTable | summarize AvgCPUPercent = avg(CounterValue) by InstanceName, bin(TimeGenerated, 30m) | render timechart",
-                                                "yAxis": {
-                                                    "isLogarithmic": false,
-                                                    "units": {
-                                                        "baseUnitType": "",
-                                                        "baseUnit": "",
-                                                        "displayUnit": ""
-                                                    },
-                                                    "customLabel": ""
-                                                },
-                                                "NavigationSelect": {}
+                                                }
                                             }
                                         }
                                     ]
