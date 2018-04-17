@@ -33,16 +33,16 @@
             "resources": [
                 {
                     "apiVersion": "2015-11-01-preview",
-                    "name": "Service Fabric Monitor",
+                    "name": "Service Fabric",
                     "type": "views",
                     "location": "[parameters('location')]",
-                    "id": "[Concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourcegroup'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workspace'),'/views/Service Fabric Monitor')]",
+                    "id": "[Concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourcegroup'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workspace'),'/views/Service Fabric')]",
                     "dependson": [
                         "[Concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourcegroup'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workspace'))]"
                     ],
                     "properties": {
-                        "Id": "Service Fabric Monitor",
-                        "Name": "Service Fabric Monitor",
+                        "Id": "Service Fabric",
+                        "Name": "Service Fabric",
                         "Author": "dekapur@microsoft.com",
                         "Source": "Local",
                         "Version": 2,
@@ -53,7 +53,7 @@
                                 "Version": 0,
                                 "Configuration": {
                                     "General": {
-                                        "title": "Operational Channel",
+                                        "title": "Service Fabric Events",
                                         "newGroup": false,
                                         "icon": "",
                                         "useIcon": false
@@ -148,6 +148,7 @@
                                         "Query": "let ['EmptyTable'] = view () {datatable(Computer:string,Name:string) [] }; let tempTable = ContainerLog | project Computer, Name; let containerLogTable = union kind = inner isfuzzy = true tempTable, (EmptyTable);  containerLogTable | summarize AggregatedValue = count() by Computer, Name",
                                         "HideGraph": false,
                                         "enableSparklines": false,
+                                        "operation": "Summary",
                                         "ColumnsTitle": {
                                             "Name": "Node",
                                             "Value": "Events"
@@ -575,7 +576,7 @@
                             "Version": 2,
                             "Configuration": {
                                 "Trend1": {
-                                    "Legend": "Operational Channel Events",
+                                    "Legend": "Service Fabric Events",
                                     "LegendColor": "#00188f",
                                     "ChartQuery": "ServiceFabricOperationalEvent | sort by TimeGenerated desc// Oql: Type=ServiceFabricOperationalEvent",
                                     "Calculation": {
@@ -585,7 +586,7 @@
                                 "Trend2": {
                                     "Legend": "Container Events",
                                     "LegendColor": "#0072c6",
-                                    "ChartQuery": "ContainerLog | sort by TimeGenerated desc// Oql: Type=ContainerLog",
+                                    "ChartQuery": "let ['EmptyTable'] = view () {datatable(TimeGenerated:datetime) [] }; let tempTable = ContainerLog | project TimeGenerated; let containerLogTable = union kind = inner isfuzzy = true tempTable, (EmptyTable);  containerLogTable | sort by TimeGenerated desc",
                                     "Calculation": {
                                         "Operation": "Sum"
                                     }
